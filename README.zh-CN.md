@@ -31,10 +31,12 @@ Dev/Collab/View seat 不能运行 Design 插件，请切换到个人 Starter 免
 
 ![Figma 配置路径：Plugins、Development、Import plugin from manifest](docs/assets/figma-import-manifest-path.png)
 
-5. 运行一次 **Plugins → Development → Layntra for Figma**。紧凑状态窗口默认
-   自动连接，并会记住 **Auto-connect** 开关。Figma 不允许插件在后台自动运行，
-   后续编辑会话可在 Properties 面板点击 **Open Layntra** 快速重开。
-6. 新建 Codex 任务，输入：
+5. 运行 **Plugins → Development → Layntra for Figma**，并在使用 Codex 期间保持
+   这个小窗口打开。确认窗口显示 **Connected locally** 后再继续。这是 Figma 端
+   的必要前置：**Auto-connect** 只负责保持本地 WebSocket 连接并重试，不能让一个
+   尚未打开的 Figma development plugin 在后台运行。后续编辑会话可在 Properties
+   面板点击 **Open Layntra** 快速重开。
+6. 只有确认插件显示 **Connected locally** 后，才新建 Codex 任务，输入：
 
 ```text
 $layntra status

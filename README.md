@@ -28,7 +28,7 @@ Design plugins.
 
 1. Clone this repository and run `./scripts/install.sh` to install the Codex
    plugin.
-2. Download and unzip the **Figma companion** using the button above.
+2. Download and unzip the **Layntra for Figma plugin** using the button above.
 3. Open a Design file in Figma Desktop.
 4. Choose **Plugins → Development → Import plugin from manifest…** and select
    `layntra-figma-plugin/manifest.json` from the unzipped download. If you cloned
@@ -36,11 +36,14 @@ Design plugins.
 
 ![Figma menu path: Plugins, Development, Import plugin from manifest](docs/assets/figma-import-manifest-path.png)
 
-5. Run **Plugins → Development → Layntra for Figma** once. The compact
-   companion auto-connects by default and remembers the **Auto-connect** switch.
-   Figma does not allow background plugins, so use **Open Layntra** in the
-   Properties panel to reopen it quickly in later editor sessions.
-6. Start a new Codex task and enter:
+5. Run **Plugins → Development → Layntra for Figma** and keep its small window
+   open while you use Codex. Confirm that it shows **Connected locally** before
+   continuing. This is a required Figma-side step: **Auto-connect** keeps the
+   local WebSocket connected and retries it, but it cannot run an unopened Figma
+   development plugin in the background. In later editor sessions, use
+   **Open Layntra** in the Properties panel to reopen it quickly.
+6. Only after the plugin shows **Connected locally**, start a new Codex task and
+   enter:
 
 ```text
 $layntra status
@@ -86,7 +89,7 @@ intents never modify Figma; write intents wait for your approval.
 ## Architecture and privacy
 
 ```text
-Codex Skill → local stdio/MCP bridge → loopback WebSocket → Figma companion
+Codex Skill → local stdio/MCP bridge → loopback WebSocket → Layntra for Figma plugin
 ```
 
 The bridge binds to `127.0.0.1:3846`. Layntra needs no Figma API token, hosted

@@ -60,6 +60,7 @@ fi
 echo
 echo "Next:"
 echo "1. Open the Design file you want to edit in Figma Desktop"
-echo "2. Keep Auto-connect on; the local bridge launches Layntra for Figma automatically"
-echo "3. If automatic import was unavailable, import ${manifest_path} once from Plugins → Development"
-echo '4. Start a new Codex task and enter: $layntra status'
+echo "2. If automatic import was unavailable, import ${manifest_path} once from Plugins → Development"
+echo "3. In Figma, run Plugins → Development → Layntra for Figma and keep it open"
+echo "4. Confirm the plugin shows Connected locally"
+echo '5. Start a new Codex task and enter: $layntra status'
