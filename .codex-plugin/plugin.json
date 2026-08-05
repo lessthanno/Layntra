@@ -8,8 +8,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Layntra",
-    "shortDescription": "Plan, approve, and apply editable Figma changes.",
-    "longDescription": "A local-first Codex plugin for inspecting Figma, reviewing a bounded plan, and applying verified changes to explicit targets.",
+    "shortDescription": "Use your local bridge for editable Figma changes.",
+    "longDescription": "The local Codex transport for the current Figma file. It avoids hosted Figma MCP quotas, shows a bounded plan, and applies only approved changes to explicit targets.",
     "developerName": "Layntra contributors",
     "category": "Productivity",
     "capabilities": [

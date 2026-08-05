@@ -1,28 +1,33 @@
 ---
 name: layntra
-description: Controlled Codex-to-Figma workflow for inspecting, planning, creating, and refining editable product designs. Use only when the user explicitly invokes $layntra.
+description: Local Codex-to-Figma workflow for inspecting, planning, creating, and refining the currently open Figma file. Use for natural-language requests about the current Figma canvas or when the user explicitly invokes $layntra.
 ---
 
 # Layntra
 
-Layntra is an explicit, controlled Codex workflow. Never auto-activate from an
-ordinary design request. The user starts it with `$layntra` and always knows the
-target, mode, and write boundary.
+Layntra is the default transport for natural-language requests to inspect or edit
+the current Figma file. `$layntra` remains an explicit shortcut, but users do not
+need to type it before every Figma request. Automatic routing does not grant write
+permission: target, mode, plan, and approval remain explicit.
 
-Use only the local Layntra MCP server. Do not switch to hosted Figma tools unless
-the user explicitly requests a different transport.
+Use only the local MCP server named `layntra`. Never call hosted Figma MCP tools,
+the Figma app connector, or another Figma server from this Skill. If the local
+server or companion is unavailable, stop with the local setup action; do not fall
+back to a hosted Figma transport. This prevents hosted MCP quotas, plan prompts,
+and accidental transport changes.
 
 ## Intents
 
 Read-only intents never change Figma:
 
-- `status`: call `get_status`; show bridge, companion, file, page, selection,
-  target, and mode.
+- `status`: call the local `get_status`; require `transport: local_loopback` and
+  `endpoint: 127.0.0.1:3846`, then show bridge, companion, file, page,
+  selection, target, and mode. Any other transport is a configuration error.
 - `inspect`: read the explicit selection or current page.
 - `review`: inspect and evaluate against the user's criteria.
 - `plan`: inspect, propose bounded changes, and wait for approval.
 
-End every read-only response with: `No Figma changes made / 尚未修改 Figma`.
+End every read-only response with: `No Figma changes made.`
 
 Write intents are controlled:
 
@@ -78,8 +83,7 @@ State:
 - confirmation instruction: `$layntra apply`.
 
 Store the plan only in this Codex task. A newer plan replaces the older one.
-Never write while presenting a plan. End with `No Figma changes made / 尚未修改
-Figma`.
+Never write while presenting a plan. End with `No Figma changes made.`
 
 ### 3. Require explicit approval
 

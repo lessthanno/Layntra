@@ -5,6 +5,19 @@ and semantic versioning.
 
 ## [Unreleased]
 
+### Added
+
+- Persistent Auto-connect control, explicit local connection states, and a
+  Properties-panel **Open Layntra** relaunch action.
+- Local transport identity in `$layntra status`.
+
+### Changed
+
+- Replaced the bilingual Figma onboarding panel with a compact English-only
+  connection control.
+- Route natural-language requests for the current Figma file through Layntra's
+  loopback bridge without falling back to Figma hosted MCP.
+
 ## [0.1.0] - 2026-08-01
 
 ### Added

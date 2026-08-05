@@ -158,6 +158,8 @@ test("MCP requests carry Layntra context through a simulated Figma plugin", asyn
   response = await mcpResponse;
   const status = JSON.parse(response.result.content[0].text);
   assert.equal(status.figmaPlugin, "connected");
+  assert.equal(status.transport, "local_loopback");
+  assert.equal(status.endpoint, "127.0.0.1:3846");
   assert.equal(status.fileName, "Disposable E2E");
   assert.equal(status.page.id, "0:1");
   assert.equal(status.selection[0].name, "Login Card");

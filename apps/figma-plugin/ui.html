@@ -1,119 +1,177 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Layntra connection control</title>
     <style>
       :root {
         color-scheme: light dark;
         --bg: var(--figma-color-bg, #ffffff);
         --surface: var(--figma-color-bg-secondary, #f5f5f5);
         --text: var(--figma-color-text, #1e1e1e);
-        --muted: var(--figma-color-text-secondary, #666666);
-        --border: var(--figma-color-border, #d8d8d8);
-        --brand: #5b5bd6;
-        --success: #16825d;
-        --warning: #a15c00;
+        --muted: var(--figma-color-text-secondary, #6b6b6b);
+        --border: var(--figma-color-border, #d9d9d9);
+        --brand: #5551ff;
+        --success: #138a62;
+        --warning: #c26a16;
+        --idle: #8a8a8a;
+        --danger: #d14343;
         --radius: 12px;
       }
+
       * { box-sizing: border-box; }
+
       body {
         margin: 0;
-        padding: 20px;
-        font: 13px/1.55 Inter, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+        padding: 16px;
         color: var(--text);
         background: var(--bg);
+        font: 13px/1.45 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
-      header { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; }
-      h1 { margin: 0; font-size: 21px; line-height: 1.25; }
-      h2 { margin: 22px 0 10px; font-size: 14px; }
-      p { margin: 6px 0 0; color: var(--muted); }
-      button { font: inherit; }
-      .eyebrow {
-        margin-bottom: 6px;
-        color: var(--brand);
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: .08em;
-        text-transform: uppercase;
-      }
-      .language {
+
+      h1, p, dl, dd { margin: 0; }
+
+      header {
         display: flex;
-        padding: 2px;
-        border: 1px solid var(--border);
+        align-items: center;
+        gap: 10px;
+        padding: 2px 2px 14px;
+      }
+
+      .mark {
+        display: grid;
+        width: 32px;
+        height: 32px;
+        flex: 0 0 auto;
+        place-items: center;
         border-radius: 9px;
-        background: var(--surface);
-      }
-      .language button {
-        min-width: 58px;
-        min-height: 44px;
-        padding: 0 8px;
-        border: 0;
-        border-radius: 7px;
-        color: var(--muted);
-        background: transparent;
-        cursor: pointer;
-      }
-      .language button[aria-pressed="true"] {
         color: #ffffff;
         background: var(--brand);
+        font-weight: 700;
       }
-      .status {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        margin: 18px 0;
-        padding: 14px;
+
+      h1 { font-size: 15px; line-height: 1.2; }
+      .subtitle { margin-top: 2px; color: var(--muted); font-size: 11px; }
+
+      .panel {
+        overflow: hidden;
         border: 1px solid var(--border);
         border-radius: var(--radius);
         background: var(--surface);
       }
-      .dot {
-        width: 12px;
-        height: 12px;
-        flex: 0 0 auto;
-        border-radius: 50%;
-        background: var(--warning);
-      }
-      .status.connected .dot { background: var(--success); }
-      .status strong, .status span { display: block; }
-      .status span { margin-top: 2px; color: var(--muted); font-size: 12px; }
-      .steps { margin: 0; padding: 0; list-style: none; counter-reset: step; }
-      .steps li {
-        position: relative;
-        min-height: 44px;
-        padding: 2px 0 14px 44px;
-        color: var(--muted);
-      }
-      .steps li::before {
-        counter-increment: step;
-        content: counter(step);
-        position: absolute;
-        left: 0;
-        top: 0;
+
+      .status {
         display: grid;
-        width: 30px;
-        height: 30px;
-        place-items: center;
-        border: 1px solid var(--border);
+        grid-template-columns: 12px 1fr;
+        column-gap: 10px;
+        min-height: 76px;
+        padding: 14px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        margin-top: 4px;
         border-radius: 50%;
-        color: var(--text);
-        background: var(--surface);
-        font-weight: 700;
+        background: var(--idle);
       }
-      code {
-        display: block;
-        margin-top: 9px;
+
+      .status[data-state="connecting"] .dot { background: var(--warning); }
+      .status[data-state="connected"] .dot { background: var(--success); }
+      .status[data-state="unavailable"] .dot { background: var(--danger); }
+
+      .status strong { display: block; font-size: 13px; }
+      .status p { margin-top: 3px; color: var(--muted); font-size: 12px; }
+
+      .control {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 16px;
+        align-items: center;
+        min-height: 72px;
         padding: 12px 14px;
-        overflow-wrap: anywhere;
-        border-left: 3px solid var(--brand);
-        border-radius: 0 9px 9px 0;
-        color: var(--text);
-        background: var(--surface);
-        font: 600 13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
       }
-      .note { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
-      :focus-visible { outline: 3px solid #8b8bf0; outline-offset: 2px; }
+
+      .control strong, .control span { display: block; }
+      .control span { margin-top: 2px; color: var(--muted); font-size: 11px; }
+
+      .switch {
+        position: relative;
+        width: 48px;
+        height: 44px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+      }
+
+      .switch::before {
+        content: "";
+        position: absolute;
+        inset: 11px 0;
+        border-radius: 999px;
+        background: var(--idle);
+      }
+
+      .switch::after {
+        content: "";
+        position: absolute;
+        top: 14px;
+        left: 3px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #ffffff;
+        box-shadow: 0 1px 2px rgb(0 0 0 / 28%);
+        transition: transform 140ms ease;
+      }
+
+      .switch[aria-checked="true"]::before { background: var(--brand); }
+      .switch[aria-checked="true"]::after { transform: translateX(26px); }
+      .switch:disabled { cursor: wait; opacity: .55; }
+
+      .context {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .context div {
+        min-width: 0;
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+      }
+
+      dt {
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+      }
+
+      dd {
+        margin-top: 3px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .platform-note {
+        margin-top: 12px;
+        padding: 0 2px;
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      :focus-visible { outline: 3px solid #8d8aff; outline-offset: 2px; }
+
       @media (prefers-reduced-motion: reduce) {
         *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
       }
@@ -121,139 +179,214 @@
   </head>
   <body>
     <header>
+      <div class="mark" aria-hidden="true">L</div>
       <div>
-        <div class="eyebrow">LOCAL · CONTROLLED · EDITABLE</div>
         <h1>Layntra for Figma</h1>
-        <p data-copy="intro">Layntra 的本地画布连接器。</p>
-      </div>
-      <div class="language" role="group" aria-label="Language / 语言">
-        <button id="lang-zh" type="button" aria-pressed="true">中文</button>
-        <button id="lang-en" type="button" aria-pressed="false">English</button>
+        <p class="subtitle">Local connection control</p>
       </div>
     </header>
 
-    <section id="connection" class="status" aria-live="polite" aria-atomic="true">
-      <div class="dot" aria-hidden="true"></div>
-      <div>
-        <strong id="connection-title">正在连接…</strong>
-        <span id="connection-detail">请保持此窗口打开。</span>
+    <section class="panel">
+      <div id="connection-status" class="status" data-state="loading" aria-live="polite" aria-atomic="true">
+        <div class="dot" aria-hidden="true"></div>
+        <div>
+          <strong id="connection-title">Loading preference</strong>
+          <p id="connection-detail">Checking your saved connection setting.</p>
+        </div>
+      </div>
+
+      <div class="control">
+        <div>
+          <strong id="auto-connect-label">Auto-connect</strong>
+          <span id="auto-connect-help">Connect whenever this companion is open.</span>
+        </div>
+        <button
+          id="connection-toggle"
+          class="switch"
+          type="button"
+          role="switch"
+          aria-checked="false"
+          aria-labelledby="auto-connect-label"
+          aria-describedby="auto-connect-help"
+          disabled
+        ></button>
       </div>
     </section>
 
-    <h2 data-copy="stepsTitle">下一步</h2>
-    <ol class="steps">
-      <li data-copy="stepKeep">保持这个窗口打开。</li>
-      <li data-copy="stepReturn">回到 Codex 并明确唤起 Layntra。</li>
-      <li data-copy="stepControl">先检查目标和计划，确认后再执行。</li>
-    </ol>
+    <dl class="context" aria-label="Current Figma context">
+      <div>
+        <dt>File</dt>
+        <dd id="file-name" title="Waiting for Figma">Waiting for Figma</dd>
+      </div>
+      <div>
+        <dt>Page</dt>
+        <dd id="page-name" title="Waiting for Figma">Waiting for Figma</dd>
+      </div>
+    </dl>
 
-    <h2 data-copy="startTitle">在 Codex 中输入</h2>
-    <code>$layntra status</code>
-    <p class="note" data-copy="controlNote">
-      Layntra 会在修改前显示文件、页面、作用范围和计划。
+    <p class="platform-note">
+      Figma requires one start per editor session. Use <strong>Open Layntra</strong> in Properties to reopen quickly.
     </p>
 
     <script>
-      const copy = {
-        "zh-CN": {
-          intro: "Layntra 的本地画布连接器。",
-          connectingTitle: "正在连接…",
-          connectingDetail: "请保持此窗口打开。",
-          connectedTitle: "已连接",
-          connectedDetail: "回到 Codex，输入 $layntra status。",
-          disconnectedTitle: "尚未连接",
-          disconnectedDetail: "请安装或刷新 Layntra Codex 插件，然后保持此窗口打开。",
-          stepsTitle: "下一步",
-          stepKeep: "保持这个窗口打开。",
-          stepReturn: "回到 Codex 并明确唤起 Layntra。",
-          stepControl: "先检查目标和计划，确认后再执行。",
-          startTitle: "在 Codex 中输入",
-          controlNote: "Layntra 会在修改前显示文件、页面、作用范围和计划。"
-        },
-        en: {
-          intro: "The local canvas companion for Layntra.",
-          connectingTitle: "Connecting…",
-          connectingDetail: "Keep this window open.",
-          connectedTitle: "Connected",
-          connectedDetail: "Return to Codex and enter $layntra status.",
-          disconnectedTitle: "Not connected",
-          disconnectedDetail: "Install or refresh the Layntra Codex plugin, then keep this window open.",
-          stepsTitle: "Next steps",
-          stepKeep: "Keep this window open.",
-          stepReturn: "Return to Codex and invoke Layntra explicitly.",
-          stepControl: "Review the target and plan before you apply.",
-          startTitle: "Enter in Codex",
-          controlNote: "Layntra shows the file, page, target, and plan before making changes."
-        }
+      const stateCopy = {
+        loading: ["Loading preference", "Checking your saved connection setting."],
+        off: ["Connection off", "Codex cannot access this Figma file."],
+        connecting: ["Connecting", "Looking for the local Layntra bridge."],
+        connected: ["Connected locally", "Codex can edit this file without hosted MCP."],
+        unavailable: ["Bridge unavailable", "Waiting for the local bridge. Retrying automatically."]
       };
 
-      let language = "zh-CN";
-      let state = "connecting";
-      let bridge;
-      let retryTimer;
+      const statusElement = document.getElementById("connection-status");
+      const titleElement = document.getElementById("connection-title");
+      const detailElement = document.getElementById("connection-detail");
+      const toggleElement = document.getElementById("connection-toggle");
+      const fileElement = document.getElementById("file-name");
+      const pageElement = document.getElementById("page-name");
+
+      let state = "loading";
+      let connectionEnabled = false;
+      let preferenceLoaded = false;
+      let bridge = null;
+      let retryTimer = null;
+      let retryAttempt = 0;
 
       function render() {
-        const strings = copy[language];
-        document.documentElement.lang = language;
-        document.querySelectorAll("[data-copy]").forEach((element) => {
-          element.textContent = strings[element.dataset.copy];
-        });
-        document.getElementById("lang-zh").setAttribute("aria-pressed", String(language === "zh-CN"));
-        document.getElementById("lang-en").setAttribute("aria-pressed", String(language === "en"));
-        const title = document.getElementById("connection-title");
-        const detail = document.getElementById("connection-detail");
-        const status = document.getElementById("connection");
-        status.classList.toggle("connected", state === "connected");
-        title.textContent = strings[`${state}Title`];
-        detail.textContent = strings[`${state}Detail`];
+        const [title, detail] = stateCopy[state];
+        statusElement.dataset.state = state;
+        titleElement.textContent = title;
+        detailElement.textContent = detail;
+        toggleElement.disabled = !preferenceLoaded;
+        toggleElement.setAttribute("aria-checked", String(connectionEnabled));
       }
 
-      function setLanguage(nextLanguage) {
-        language = nextLanguage;
+      function setState(nextState) {
+        state = nextState;
         render();
       }
 
-      document.getElementById("lang-zh").onclick = () => setLanguage("zh-CN");
-      document.getElementById("lang-en").onclick = () => setLanguage("en");
+      function updateContext(fileName, pageName) {
+        if (typeof fileName === "string" && fileName.trim()) {
+          fileElement.textContent = fileName;
+          fileElement.title = fileName;
+        }
+        if (typeof pageName === "string" && pageName.trim()) {
+          pageElement.textContent = pageName;
+          pageElement.title = pageName;
+        }
+      }
+
+      function stopBridge() {
+        clearTimeout(retryTimer);
+        retryTimer = null;
+        retryAttempt = 0;
+        const activeBridge = bridge;
+        bridge = null;
+        if (activeBridge) {
+          activeBridge.onclose = null;
+          activeBridge.onerror = null;
+          activeBridge.close();
+        }
+      }
+
+      function scheduleReconnect() {
+        if (!connectionEnabled) return;
+        setState("unavailable");
+        const delay = Math.min(1000 * (2 ** retryAttempt), 8000);
+        retryAttempt += 1;
+        retryTimer = setTimeout(connectBridge, delay);
+      }
 
       function connectBridge() {
+        if (!preferenceLoaded || !connectionEnabled) return;
+        if (bridge) return;
         clearTimeout(retryTimer);
-        state = "connecting";
-        render();
-        bridge = new WebSocket("ws://localhost:3846");
-        bridge.onopen = () => {
-          state = "connected";
-          render();
-          bridge.send(JSON.stringify({ type: "hello", client: "layntra-figma" }));
+        retryTimer = null;
+        setState("connecting");
+
+        const socket = new WebSocket("ws://localhost:3846");
+        bridge = socket;
+        socket.onopen = () => {
+          if (bridge !== socket || !connectionEnabled) return;
+          retryAttempt = 0;
+          setState("connected");
+          socket.send(JSON.stringify({ type: "hello", client: "layntra-figma" }));
         };
-        bridge.onclose = () => {
-          state = "disconnected";
-          render();
-          retryTimer = setTimeout(connectBridge, 2000);
+        socket.onclose = () => {
+          if (bridge !== socket) return;
+          bridge = null;
+          scheduleReconnect();
         };
-        bridge.onerror = () => bridge.close();
-        bridge.onmessage = (event) => {
-          const incoming = JSON.parse(event.data);
-          if (incoming.type === "command") {
+        socket.onerror = () => socket.close();
+        socket.onmessage = (event) => {
+          let incoming;
+          try {
+            incoming = JSON.parse(event.data);
+          } catch {
+            return;
+          }
+          if (
+            incoming?.type === "command" &&
+            typeof incoming.requestId === "string" &&
+            typeof incoming.command === "string" &&
+            (!incoming.args || typeof incoming.args === "object")
+          ) {
             parent.postMessage({ pluginMessage: {
               type: "mcp-command",
               requestId: incoming.requestId,
               command: incoming.command,
-              args: incoming.args
+              args: incoming.args || {}
             } }, "*");
           }
         };
       }
 
+      function setConnectionEnabled(enabled, persist) {
+        connectionEnabled = enabled;
+        if (persist) {
+          parent.postMessage({ pluginMessage: {
+            type: "connection-preference-changed",
+            enabled
+          } }, "*");
+        }
+        if (enabled) {
+          connectBridge();
+        } else {
+          stopBridge();
+          setState("off");
+        }
+        render();
+      }
+
+      toggleElement.onclick = () => setConnectionEnabled(!connectionEnabled, true);
+
       onmessage = (event) => {
         const incoming = event.data.pluginMessage;
-        if (incoming && incoming.type === "mcp-result" && bridge?.readyState === WebSocket.OPEN) {
+        if (!incoming || typeof incoming !== "object") return;
+
+        if (incoming.type === "connection-preference") {
+          const wasLoaded = preferenceLoaded;
+          preferenceLoaded = true;
+          updateContext(incoming.fileName, incoming.pageName);
+          const enabled = incoming.enabled !== false;
+          if (!wasLoaded || enabled !== connectionEnabled) {
+            setConnectionEnabled(enabled, false);
+          } else {
+            render();
+          }
+          return;
+        }
+        if (incoming.type === "figma-context") {
+          updateContext(incoming.fileName, incoming.pageName);
+          return;
+        }
+        if (incoming.type === "mcp-result" && bridge?.readyState === WebSocket.OPEN) {
           bridge.send(JSON.stringify(incoming));
         }
       };
 
       render();
-      connectBridge();
+      parent.postMessage({ pluginMessage: { type: "connection-preference-requested" } }, "*");
     </script>
   </body>
 </html>

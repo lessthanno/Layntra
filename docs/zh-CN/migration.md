@@ -29,7 +29,8 @@ codex plugin marketplace remove figma-local-mcp
 
 在 Figma Desktop 中打开一个 Design 文件，选择 **Plugins → Development →
 Import plugin from manifest…**，导入 `apps/figma-plugin/manifest.json`。然后运行
-**Plugins → Development → Layntra for Figma** 并保持窗口打开。
+一次 **Plugins → Development → Layntra for Figma**。它默认自动连接，并在
+Properties 面板提供 **Open Layntra** 快速重开入口。
 
 新建 Codex 任务并输入：
 

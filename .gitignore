@@ -5,6 +5,7 @@ packages/mcp-bridge/node_modules/
 /dist/
 /artifacts/
 .DS_Store
+._*
 
 # Demo photos and source-poster exports are intentionally not published.
 assets/

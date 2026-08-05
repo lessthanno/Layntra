@@ -18,8 +18,11 @@ This guide assumes no plugin-development experience.
 
 ![Figma menu path: Plugins, Development, Import plugin from manifest](../assets/figma-import-manifest-path.png)
 
-7. Run **Plugins → Development → Layntra for Figma** and keep its status window
-   open.
+7. Run **Plugins → Development → Layntra for Figma** once. The compact
+   companion auto-connects by default and remembers the **Auto-connect** switch.
+   Figma does not allow background plugins, so later editor sessions still need
+   one user start. Use **Open Layntra** in the Properties panel instead of
+   navigating the Development menu again.
 8. Start a new Codex task so the installed plugin is loaded.
 
 ## Confirm the connection

@@ -31,7 +31,9 @@ Dev/Collab/View seat 不能运行 Design 插件，请切换到个人 Starter 免
 
 ![Figma 配置路径：Plugins、Development、Import plugin from manifest](docs/assets/figma-import-manifest-path.png)
 
-5. 运行 **Plugins → Development → Layntra for Figma**，保持窗口打开。
+5. 运行一次 **Plugins → Development → Layntra for Figma**。紧凑状态窗口默认
+   自动连接，并会记住 **Auto-connect** 开关。Figma 不允许插件在后台自动运行，
+   后续编辑会话可在 Properties 面板点击 **Open Layntra** 快速重开。
 6. 新建 Codex 任务，输入：
 
 ```text

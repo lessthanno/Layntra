@@ -9,8 +9,9 @@ $layntra status
 
 ## 伴侣插件未连接
 
-打开目标 Design 文件，运行 **Layntra for Figma** 并保持窗口打开。如果已经打开，
-先关闭再重新运行，然后新建 Codex 任务。断开状态下不要执行计划。
+打开目标 Design 文件并运行 **Layntra for Figma**，确认 **Auto-connect** 已开启且
+状态变为 **Connected**。窗口关闭后可在 Properties 面板点击 **Open Layntra**
+重开，然后新建 Codex 任务。断开状态下不要执行计划。
 
 ## 3846 端口被占用
 

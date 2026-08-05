@@ -6,6 +6,9 @@
   "ui": "ui.html",
   "editorType": ["figma"],
   "documentAccess": "dynamic-page",
+  "relaunchButtons": [
+    { "command": "open", "name": "Open Layntra", "multipleSelection": true }
+  ],
   "networkAccess": {
     "allowedDomains": ["ws://localhost:3846", "http://localhost:3846"],
     "reasoning": "Connect only to the user's local Layntra bridge so approved Codex commands can update the current Figma file without a cloud bridge or Figma API token."

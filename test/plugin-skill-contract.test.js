@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-test("Layntra requires explicit controlled activation", async () => {
+test("Layntra is the default local transport for current-file Figma requests", async () => {
   const skill = await readFile("skills/layntra/SKILL.md", "utf8");
   assert.match(skill, /^name: layntra$/m);
   assert.match(skill, /\$layntra/);
@@ -10,7 +10,9 @@ test("Layntra requires explicit controlled activation", async () => {
   assert.match(skill, /No Figma changes made|尚未修改 Figma/);
   assert.match(skill, /expectedContext/);
   assert.match(skill, /Command \+ Z/);
-  assert.match(skill, /Never auto-activate/i);
+  assert.match(skill, /current.*Figma file/i);
+  assert.match(skill, /never.*hosted Figma/i);
+  assert.match(skill, /do not fall\s+back/i);
 });
 
 test("Codex metadata exposes only controlled Layntra prompts", async () => {
@@ -22,6 +24,9 @@ test("Codex metadata exposes only controlled Layntra prompts", async () => {
   assert.equal(metadata.mcpServers, "./.mcp.json");
   assert.ok(metadata.interface.defaultPrompt.every((prompt) => prompt.startsWith("$layntra")));
   assert.ok(mcp.mcpServers.layntra);
+  assert.equal(Object.keys(mcp.mcpServers).length, 1);
+  assert.equal(mcp.mcpServers.layntra.command, "node");
+  assert.equal(mcp.mcpServers.layntra.cwd, "./packages/mcp-bridge");
 });
 
 test("Poster example remains explicitly opt-in", async () => {

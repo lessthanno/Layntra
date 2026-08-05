@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { access, readFile } from "node:fs/promises";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 
 const pairs = [
   ["docs/en/getting-started.md", "docs/zh-CN/getting-started.md"],
@@ -33,7 +34,7 @@ test("README links resolve and beginner flow precedes protocol details", async (
     const preface = content.slice(0, quickStart);
     assert.doesNotMatch(preface, /\bMCP\b|WebSocket|JSON|API token/i);
     for (const match of content.matchAll(/\[[^\]]+\]\((?!https?:|#)([^)]+\.md)\)/g)) {
-      const path = new URL(match[1], new URL(`file://${process.cwd()}/${file}`)).pathname;
+      const path = fileURLToPath(new URL(match[1], new URL(`file://${process.cwd()}/${file}`)));
       await access(path);
     }
   }

@@ -116,6 +116,8 @@ test("status explains how to connect when Figma is not open", async (t) => {
 
   const status = JSON.parse(response.result.content[0].text);
   assert.equal(status.bridge, "ready");
+  assert.equal(status.transport, "local_loopback");
+  assert.equal(status.endpoint, "127.0.0.1:3846");
   assert.equal(status.figmaPlugin, "not_connected");
   assert.match(status.nextStep, /Layntra for Figma/);
 });

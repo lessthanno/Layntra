@@ -4,6 +4,9 @@
 - Date: 2026-08-01
 - Owner: Layntra maintainers
 
+The explicit-activation portion of this decision is superseded by ADR 0009.
+Targeting, planning, approval, stale-context, and recovery controls remain active.
+
 ## Context
 
 The project began as a poster assistant and later became a general local Figma

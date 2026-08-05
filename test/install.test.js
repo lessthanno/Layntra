@@ -5,7 +5,7 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 import test from "node:test";
 
-async function runInstaller(t, { nodeMajor = 20, marketplace = "missing", includeCodex = true, language = "en" } = {}) {
+async function runInstaller(t, { nodeMajor = 20, marketplace = "missing", includeCodex = true } = {}) {
   const dir = await mkdtemp(path.join(tmpdir(), "layntra-install-"));
   t.after(() => rm(dir, { recursive: true, force: true }));
   const log = path.join(dir, "codex.log");
@@ -33,8 +33,7 @@ if [ "$*" = "plugin marketplace list" ]; then printf '${listing}\\n'; fi
     env: {
       ...process.env,
       PATH: `${dir}:/usr/bin:/bin`,
-      FAKE_CODEX_LOG: log,
-      LAYNTRA_LANG: language
+      FAKE_CODEX_LOG: log
     }
   });
   let codexLog = "";
@@ -53,10 +52,11 @@ test("installer registers and installs Layntra with actionable output", async (t
 });
 
 test("installer is idempotent for the same marketplace path", async (t) => {
-  const result = await runInstaller(t, { marketplace: "same", language: "zh-CN" });
+  const result = await runInstaller(t, { marketplace: "same" });
   assert.equal(result.status, 0, result.stderr);
   assert.doesNotMatch(result.codexLog, /marketplace add/);
-  assert.match(result.stdout, /已安装/);
+  assert.match(result.stdout, /already registered/);
+  assert.doesNotMatch(result.stdout, /[\u3400-\u9fff]/);
 });
 
 test("installer rejects an old Node runtime", async (t) => {

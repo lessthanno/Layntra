@@ -9,9 +9,10 @@ $layntra status
 
 ## Companion is not connected
 
-Open the intended Design file, run **Layntra for Figma**, and keep the window
-open. If it was already open, close and run it again, then start a new Codex
-task. Do not apply a plan while status is disconnected.
+Open the intended Design file and run **Layntra for Figma**. Confirm that
+**Auto-connect** is on and the visible state reaches **Connected**. If the
+companion was closed, use **Open Layntra** in the Properties panel to reopen it,
+then start a new Codex task. Do not apply a plan while status is disconnected.
 
 ## Port 3846 is in use
 
@@ -24,6 +25,14 @@ diagnostic session.
 An organization Dev, Collab, or View seat may block Design plugins. Switch to a
 personal Starter workspace for the free path. Do not submit a potentially paid
 seat request unless you intend to.
+
+## Figma shows an MCP plan or tool-call limit
+
+That prompt belongs to Figma's hosted MCP, not Layntra. Stop the current action
+instead of upgrading. Run `$layntra status` and require
+`transport: local_loopback` with `endpoint: 127.0.0.1:3846` before continuing.
+Layntra must not fall back to a hosted Figma transport when its local companion
+is unavailable.
 
 ## No selection
 

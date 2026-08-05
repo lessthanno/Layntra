@@ -29,7 +29,9 @@ From the repository root:
 
 In Figma Desktop, open a Design file and choose **Plugins → Development →
 Import plugin from manifest…**. Select `apps/figma-plugin/manifest.json`, then
-run **Plugins → Development → Layntra for Figma** and keep the window open.
+run **Plugins → Development → Layntra for Figma** once. The companion
+auto-connects by default and adds **Open Layntra** to the Properties panel for
+quick access in later editor sessions.
 
 Start a new Codex task and enter:
 

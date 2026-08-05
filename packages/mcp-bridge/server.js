@@ -208,11 +208,15 @@ async function toolCall(name, args = {}) {
     const pluginConnected = [...clients].some((socket) => socket.isFigmaPlugin && !socket.destroyed);
     if (!pluginConnected) return {
       bridge: "ready",
+      transport: "local_loopback",
+      endpoint: "127.0.0.1:3846",
       figmaPlugin: "not_connected",
       nextStep: "Open Figma Desktop, open a Design file, then run Plugins → Development → Layntra for Figma."
     };
     return {
       bridge: "ready",
+      transport: "local_loopback",
+      endpoint: "127.0.0.1:3846",
       figmaPlugin: "connected",
       ...await callPlugin("get_context", {})
     };

@@ -16,7 +16,7 @@ Layntra is open-source design infrastructure that connects Codex to a local Figm
 2. Download `layntra-figma-plugin.zip` from the v0.1.0 GitHub release and unzip it.
 3. In Figma Desktop, open a Design file and choose Plugins → Development → Import plugin from manifest.
 4. Select `layntra-figma-plugin/manifest.json` from the unzipped download.
-5. Run Plugins → Development → Layntra for Figma and keep its window open.
+5. Run Plugins → Development → Layntra for Figma once. Auto-connect is on by default; use Open Layntra in Properties to reopen it later.
 6. In a new Codex task, enter `$layntra status`.
 7. Use inspect, review, or plan commands for read-only work.
 8. Use `$layntra apply` only after reviewing the target and plan.

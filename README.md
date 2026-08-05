@@ -36,7 +36,10 @@ Design plugins.
 
 ![Figma menu path: Plugins, Development, Import plugin from manifest](docs/assets/figma-import-manifest-path.png)
 
-5. Run **Plugins → Development → Layntra for Figma** and keep its window open.
+5. Run **Plugins → Development → Layntra for Figma** once. The compact
+   companion auto-connects by default and remembers the **Auto-connect** switch.
+   Figma does not allow background plugins, so use **Open Layntra** in the
+   Properties panel to reopen it quickly in later editor sessions.
 6. Start a new Codex task and enter:
 
 ```text
@@ -89,6 +92,10 @@ Codex Skill → local stdio/MCP bridge → loopback WebSocket → Figma companio
 The bridge binds to `127.0.0.1:3846`. Layntra needs no Figma API token, hosted
 Layntra account, or telemetry. Codex model data handling remains governed by
 your Codex configuration; “local bridge” does not mean the AI model is offline.
+When Layntra is active, it does not call Figma's hosted MCP and therefore does
+not consume Figma hosted-MCP tool-call quotas. If Figma displays an MCP upgrade
+prompt, the request was routed through the wrong transport; stop and run
+`$layntra status` to confirm `local_loopback` and `127.0.0.1:3846`.
 
 Writes are limited to supported editable nodes and batches of at most 100.
 Deletion and arbitrary code execution are not exposed in `v0.1.0`.

@@ -1,6 +1,26 @@
-// The iframe stays hidden but remains alive as the local MCP transport.
-// Launch this once after opening the Figma file; Codex then drives it through MCP.
-figma.showUI(__html__, { width: 380, height: 560, visible: true, themeColors: true });
+// Figma does not allow background plugins, so the compact UI remains the honest
+// connection boundary while this plugin is running.
+figma.showUI(__html__, { width: 360, height: 330, visible: true, themeColors: true });
+
+const CONNECTION_ENABLED_KEY = "layntra.connectionEnabled";
+
+function postFigmaContext(type = "figma-context", enabled) {
+  figma.ui.postMessage({
+    type,
+    ...(typeof enabled === "boolean" ? { enabled } : {}),
+    fileName: figma.root.name,
+    pageName: figma.currentPage.name
+  });
+}
+
+async function sendConnectionPreference() {
+  const storedPreference = await figma.clientStorage.getAsync(CONNECTION_ENABLED_KEY);
+  postFigmaContext("connection-preference", storedPreference !== false);
+}
+
+figma.root.setRelaunchData({ open: "Open the Layntra connection controls." });
+figma.on("currentpagechange", () => postFigmaContext());
+sendConnectionPreference().catch(() => postFigmaContext("connection-preference", true));
 
 const TARGET_NAME = "PHOTO / Replace speaker portrait";
 const HIDE_AFTER_REPLACE = [
@@ -910,6 +930,19 @@ async function runWrite(operation) {
 
 figma.ui.onmessage = async (message) => {
   try {
+    if (message.type === "connection-preference-requested") {
+      await sendConnectionPreference();
+      return;
+    }
+
+    if (message.type === "connection-preference-changed") {
+      if (typeof message.enabled !== "boolean") {
+        throw new Error("Connection preference must be a boolean.");
+      }
+      await figma.clientStorage.setAsync(CONNECTION_ENABLED_KEY, message.enabled);
+      return;
+    }
+
     if (message.type === "replace-photo") {
       const count = await runWrite(() => replacePhoto(message.bytes));
       figma.ui.postMessage({ type: "success", message: `已替换 ${count} 个照片框。` });

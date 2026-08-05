@@ -16,7 +16,9 @@
 
 ![Figma 配置路径：Plugins、Development、Import plugin from manifest](../assets/figma-import-manifest-path.png)
 
-7. 运行 **Plugins → Development → Layntra for Figma**，保持状态窗口打开。
+7. 运行一次 **Plugins → Development → Layntra for Figma**。紧凑状态窗口默认
+   自动连接并记住 **Auto-connect** 开关。Figma 不允许插件在后台自动运行，后续
+   编辑会话可在 Properties 面板点击 **Open Layntra** 快速重开。
 8. 新建 Codex 任务，让刚安装的插件被加载。
 
 ## 确认连接
