@@ -33,7 +33,8 @@ if [ "$*" = "plugin marketplace list" ]; then printf '${listing}\\n'; fi
     env: {
       ...process.env,
       PATH: `${dir}:/usr/bin:/bin`,
-      FAKE_CODEX_LOG: log
+      FAKE_CODEX_LOG: log,
+      LAYNTRA_SKIP_FIGMA_IMPORT: "1"
     }
   });
   let codexLog = "";
@@ -48,6 +49,7 @@ test("installer registers and installs Layntra with actionable output", async (t
   assert.match(result.codexLog, /plugin marketplace add/);
   assert.match(result.codexLog, /plugin add layntra@layntra/);
   assert.match(result.stdout, /apps\/figma-plugin\/manifest\.json/);
+  assert.match(result.stdout, /launches Layntra for Figma automatically/);
   assert.match(result.stdout, /\$layntra status/);
 });
 

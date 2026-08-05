@@ -23,7 +23,7 @@ Layntra 的 Figma 端，Codex 插件在下面第 1 步安装。
 Dev/Collab/View seat 不能运行 Design 插件，请切换到个人 Starter 免费空间。
 
 1. 克隆本仓库，运行 `./scripts/install.sh`，安装 Codex 插件。
-2. 点击上方按钮下载并解压 **Figma 伴侣插件**。
+2. 点击上方按钮下载并解压 **Layntra for Figma plugin**。
 3. 在 Figma Desktop 中打开一个 Design 文件。
 4. 选择 **Plugins → Development → Import plugin from manifest…**，导入解压后
    的 `layntra-figma-plugin/manifest.json`。如果你克隆了仓库，也可以导入同一
@@ -79,7 +79,7 @@ Figma 目标已经改变，Layntra 会拒绝猜测要撤销哪一步。
 ## 架构与隐私
 
 ```text
-Codex Skill → 本地 stdio/MCP Bridge → 本机 WebSocket → Figma 伴侣插件
+Codex Skill → 本地 stdio/MCP Bridge → 本机 WebSocket → Layntra for Figma plugin
 ```
 
 Bridge 只监听 `127.0.0.1:3846`。Layntra 不需要 Figma API token、Layntra 云账号

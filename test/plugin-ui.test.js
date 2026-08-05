@@ -16,10 +16,11 @@ test("Figma companion is an English-only connection control", async () => {
   assert.match(html, /44px/);
   assert.match(html, /Bridge unavailable/);
   assert.match(html, /Connection off/);
-  assert.match(html, /without hosted MCP/);
+  assert.match(html, /Layntra MCP · local only/);
   assert.match(html, /connection-preference-changed/);
   assert.doesNotMatch(html, /[\u3400-\u9fff]/);
   assert.doesNotMatch(html, /language|three steps|\$layntra status/i);
+  assert.doesNotMatch(html, /Guest photo|Replace template photo|Guest name|Update entered text|file-name|page-name/i);
 });
 
 test("Figma runtime persists connection preference and adds a quick reopen action", async () => {
@@ -28,6 +29,11 @@ test("Figma runtime persists connection preference and adds a quick reopen actio
   assert.match(code, /clientStorage\.setAsync\(/);
   assert.match(code, /connection-preference/);
   assert.match(code, /setRelaunchData\(/);
+  assert.match(code, /const UI_WIDTH = 248/);
+  assert.match(code, /const UI_HEIGHT = 64/);
+  assert.match(code, /position: lowerLeftPosition/);
+  assert.match(code, /figma\.viewport\.bounds/);
+  assert.doesNotMatch(code, /message\.type === "replace-photo"|message\.type === "apply-details"/);
 });
 
 test("connection control follows preference, connection, retry, and off states", async () => {
@@ -95,7 +101,6 @@ test("connection control follows preference, connection, retry, and off states",
   assert.equal(FakeWebSocket.instances.length, 1);
   assert.equal(element("connection-status").dataset.state, "connecting");
   assert.equal(element("connection-toggle").getAttribute("aria-checked"), "true");
-  assert.equal(element("file-name").textContent, "Checkout");
 
   const socket = FakeWebSocket.instances[0];
   socket.readyState = FakeWebSocket.OPEN;

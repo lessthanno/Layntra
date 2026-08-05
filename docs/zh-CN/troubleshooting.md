@@ -1,13 +1,13 @@
 # 故障排查
 
-伴侣 manifest 位于 `apps/figma-plugin/manifest.json`。从 **Plugins → Development**
+Figma plugin manifest 位于 `apps/figma-plugin/manifest.json`。从 **Plugins → Development**
 导入或运行，然后检查：
 
 ```text
 $layntra status
 ```
 
-## 伴侣插件未连接
+## Figma plugin 未连接
 
 打开目标 Design 文件并运行 **Layntra for Figma**，确认 **Auto-connect** 已开启且
 状态变为 **Connected**。窗口关闭后可在 Properties 面板点击 **Open Layntra**

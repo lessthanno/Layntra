@@ -1,11 +1,42 @@
 import crypto from "node:crypto";
+import { EventEmitter } from "node:events";
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
+
+import { createFigmaAutoLauncher } from "./figma-auto-launch.js";
 
 const HOST = "127.0.0.1";
 const PORT = Number(process.env.LAYNTRA_PORT || process.env.AI_POSTER_PORT || 3846);
 const clients = new Set();
 const pending = new Map();
+const pluginEvents = new EventEmitter();
+const autoLauncher = createFigmaAutoLauncher();
+
+function activePluginOrNull() {
+  return [...clients].find((socket) => socket.isFigmaPlugin && !socket.destroyed) || null;
+}
+
+function waitForPlugin(timeoutMs = 3_000) {
+  if (activePluginOrNull()) return Promise.resolve(true);
+  return new Promise((resolve) => {
+    const onConnected = () => {
+      clearTimeout(timeout);
+      resolve(true);
+    };
+    const timeout = setTimeout(() => {
+      pluginEvents.off("connected", onConnected);
+      resolve(false);
+    }, timeoutMs);
+    pluginEvents.once("connected", onConnected);
+  });
+}
+
+async function ensurePlugin() {
+  if (activePluginOrNull()) return true;
+  const launch = await autoLauncher.request();
+  if (!["launching", "requested", "connected"].includes(launch.state)) return false;
+  return waitForPlugin();
+}
 
 function sendFrame(socket, payload) {
   const body = Buffer.from(payload);
@@ -26,7 +57,7 @@ function sendFrame(socket, payload) {
   socket.write(Buffer.concat([header, body]));
 }
 
-function parseFrames(state, chunk, onMessage) {
+function parseFrames(state, chunk, onMessage, onControl) {
   state.buffer = Buffer.concat([state.buffer, chunk]);
   while (state.buffer.length >= 2) {
     const first = state.buffer[0];
@@ -49,14 +80,18 @@ function parseFrames(state, chunk, onMessage) {
     state.buffer = state.buffer.subarray(offset + maskLength + length);
     if (mask) for (let index = 0; index < payload.length; index += 1) payload[index] ^= mask[index % 4];
     const opcode = first & 0x0f;
-    if (opcode === 0x8) return;
+    if (opcode === 0x8 || opcode === 0x9 || opcode === 0xa) {
+      onControl(opcode, payload);
+      if (opcode === 0x8) return;
+      continue;
+    }
     if (opcode === 0x1) onMessage(payload.toString("utf8"));
   }
 }
 
 function activePlugin() {
-  const client = [...clients].find((socket) => socket.isFigmaPlugin && !socket.destroyed);
-  if (!client) throw new Error("Figma companion is not connected. Open the target file and run Plugins → Development → Layntra for Figma.");
+  const client = activePluginOrNull();
+  if (!client) throw new Error("Layntra for Figma is not connected. Automatic launch did not complete; hosted Figma MCP fallback is disabled.");
   return client;
 }
 
@@ -66,9 +101,9 @@ function callPlugin(command, args = {}) {
   return new Promise((resolve, reject) => {
     const timeout = setTimeout(() => {
       pending.delete(requestId);
-      reject(new Error("等待 Figma 插件超时。请确认插件窗口仍处于打开状态。"));
+      reject(new Error("Timed out waiting for Layntra for Figma. Hosted Figma MCP fallback is disabled."));
     }, 30_000);
-    pending.set(requestId, { resolve, reject, timeout });
+    pending.set(requestId, { resolve, reject, timeout, client });
     sendFrame(client, JSON.stringify({ type: "command", requestId, command, args }));
   });
 }
@@ -76,8 +111,15 @@ function callPlugin(command, args = {}) {
 function handleBridgeMessage(socket, raw) {
   try {
     const message = JSON.parse(raw);
-    if (message.type === "hello" && ["layntra-figma", "ai-poster-assistant"].includes(message.client)) {
+    if (message.type === "hello" && message.client === "layntra-figma") {
       socket.isFigmaPlugin = true;
+      autoLauncher.markConnected();
+      pluginEvents.emit("connected");
+      return;
+    }
+    if (message.type === "connection-preference" && message.enabled === false) {
+      socket.connectionDisabled = true;
+      autoLauncher.suppress();
       return;
     }
     if (message.type === "controller-command") {
@@ -109,11 +151,49 @@ httpServer.on("upgrade", (request, socket) => {
   socket.write(`HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: ${accept}\r\n\r\n`);
   const state = { buffer: Buffer.alloc(0) };
   clients.add(socket);
-  socket.on("data", (chunk) => parseFrames(state, chunk, (message) => handleBridgeMessage(socket, message)));
-  socket.on("close", () => clients.delete(socket));
-  socket.on("error", () => clients.delete(socket));
+  const removeClient = () => {
+    if (socket.cleanedUp) return;
+    socket.cleanedUp = true;
+    const wasPlugin = socket.isFigmaPlugin;
+    const wasDisabled = socket.connectionDisabled;
+    clients.delete(socket);
+    for (const [requestId, request] of pending) {
+      if (request.client !== socket) continue;
+      clearTimeout(request.timeout);
+      pending.delete(requestId);
+      request.reject(new Error("Layntra for Figma disconnected. Hosted Figma MCP fallback is disabled."));
+    }
+    if (wasPlugin && !activePluginOrNull()) {
+      if (wasDisabled) {
+        autoLauncher.suppress();
+      } else {
+        autoLauncher.markDisconnected();
+        const retry = setTimeout(() => { void ensurePlugin(); }, 750);
+        retry.unref?.();
+      }
+    }
+  };
+  socket.on("data", (chunk) => parseFrames(
+    state,
+    chunk,
+    (message) => handleBridgeMessage(socket, message),
+    (opcode, payload) => {
+      if (opcode === 0x8) {
+        removeClient();
+        socket.end();
+      } else if (opcode === 0x9 && payload.length <= 125) {
+        socket.write(Buffer.concat([Buffer.from([0x8a, payload.length]), payload]));
+      }
+    }
+  ));
+  socket.on("close", removeClient);
+  socket.on("error", removeClient);
 });
-httpServer.listen(PORT, HOST, () => console.error(`Layntra bridge ready. WebSocket: ws://${HOST}:${httpServer.address().port}`));
+httpServer.listen(PORT, HOST, () => {
+  console.error(`Layntra bridge ready. WebSocket: ws://${HOST}:${httpServer.address().port}`);
+  const startup = setTimeout(() => { void ensurePlugin(); }, 500);
+  startup.unref?.();
+});
 
 const expectedContextSchema = {
   type: "object",
@@ -205,22 +285,28 @@ const tools = [
 async function toolCall(name, args = {}) {
   if (!tools.some((tool) => tool.name === name)) throw new Error(`Unknown tool: ${name}`);
   if (name === "get_status") {
-    const pluginConnected = [...clients].some((socket) => socket.isFigmaPlugin && !socket.destroyed);
-    if (!pluginConnected) return {
+    await ensurePlugin();
+    const pluginConnected = Boolean(activePluginOrNull());
+    const transport = {
       bridge: "ready",
       transport: "local_loopback",
       endpoint: "127.0.0.1:3846",
+      transportPolicy: "local_only",
+      fallback: "none",
+      autoLaunch: autoLauncher.status()
+    };
+    if (!pluginConnected) return {
+      ...transport,
       figmaPlugin: "not_connected",
-      nextStep: "Open Figma Desktop, open a Design file, then run Plugins → Development → Layntra for Figma."
+      nextStep: "Resolve the reported local auto-launch state for Layntra for Figma. Hosted Figma MCP fallback is disabled."
     };
     return {
-      bridge: "ready",
-      transport: "local_loopback",
-      endpoint: "127.0.0.1:3846",
+      ...transport,
       figmaPlugin: "connected",
       ...await callPlugin("get_context", {})
     };
   }
+  if (!activePluginOrNull()) await ensurePlugin();
   if (name === "create_nodes" && (!Array.isArray(args.nodes) || args.nodes.length < 1 || args.nodes.length > 100)) {
     throw new Error("create_nodes requires 1–100 node specifications.");
   }

@@ -12,7 +12,7 @@ permission: target, mode, plan, and approval remain explicit.
 
 Use only the local MCP server named `layntra`. Never call hosted Figma MCP tools,
 the Figma app connector, or another Figma server from this Skill. If the local
-server or companion is unavailable, stop with the local setup action; do not fall
+server or Figma plugin is unavailable, stop with the local setup action; do not fall
 back to a hosted Figma transport. This prevents hosted MCP quotas, plan prompts,
 and accidental transport changes.
 
@@ -21,7 +21,8 @@ and accidental transport changes.
 Read-only intents never change Figma:
 
 - `status`: call the local `get_status`; require `transport: local_loopback` and
-  `endpoint: 127.0.0.1:3846`, then show bridge, companion, file, page,
+  `endpoint: 127.0.0.1:3846`, `transportPolicy: local_only`, and
+  `fallback: none`, then show bridge, Figma plugin, auto-launch, file, page,
   selection, target, and mode. Any other transport is a configuration error.
 - `inspect`: read the explicit selection or current page.
 - `review`: inspect and evaluate against the user's criteria.
@@ -53,9 +54,12 @@ existing work when the target is ambiguous.
 
 ### 1. Connect and capture context
 
-Call `get_status`. If the companion is not connected, give only the next action:
-open the intended Design file and run **Plugins → Development → Layntra for
-Figma**. Do not pretend the document is available.
+Call `get_status`. The bridge automatically requests the exact local development
+plugin **Layntra for Figma** on macOS. If the Figma plugin is not connected, use the
+reported `autoLaunch.state` and `autoLaunch.error` to give one local recovery
+action: open a Design file, grant macOS Accessibility permission, or re-run the
+installer to import the current manifest. Never suggest a hosted Figma MCP,
+upgrade, API token, or fallback. Do not pretend the document is available.
 
 For `selection`, call `get_selection`. For `page` or `new-frame`, call
 `get_document`. Capture:
@@ -107,7 +111,7 @@ only what the tool result proves:
 - nodes created and updated;
 - preserved constraints verified;
 - partial or skipped work;
-- recovery: enter `$layntra undo` immediately; after closing the companion,
+- recovery: enter `$layntra undo` immediately; after closing Layntra for Figma,
   Figma's `Command + Z` and version history remain manual fallbacks.
 
 Store the observed post-apply page and selection as the recovery context. Accept

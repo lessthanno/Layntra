@@ -7,12 +7,12 @@ import test from "node:test";
 
 const bridgeDir = path.resolve(import.meta.dirname, "..");
 
-function maskedFrame(message) {
+function maskedFrame(message, opcode = 0x1) {
   const payload = Buffer.from(message);
   const mask = crypto.randomBytes(4);
   const header = payload.length < 126
-    ? Buffer.from([0x81, 0x80 | payload.length])
-    : Buffer.from([0x81, 0x80 | 126, payload.length >> 8, payload.length & 0xff]);
+    ? Buffer.from([0x80 | opcode, 0x80 | payload.length])
+    : Buffer.from([0x80 | opcode, 0x80 | 126, payload.length >> 8, payload.length & 0xff]);
   const masked = Buffer.from(payload);
   for (let index = 0; index < masked.length; index += 1) masked[index] ^= mask[index % 4];
   return Buffer.concat([header, mask, masked]);
@@ -36,10 +36,12 @@ function readServerFrame(buffer) {
 
 test("MCP requests carry Layntra context through a simulated Figma plugin", async (t) => {
   const child = spawn(process.execPath, [path.join(bridgeDir, "server.js")], {
-    env: { ...process.env, LAYNTRA_PORT: "0" },
+    env: { ...process.env, LAYNTRA_PORT: "0", LAYNTRA_AUTO_LAUNCH: "0" },
     stdio: ["pipe", "pipe", "pipe"]
   });
   t.after(() => child.kill());
+  let bridgeStderr = "";
+  child.stderr.on("data", (chunk) => { bridgeStderr += chunk; });
 
   const port = await new Promise((resolve, reject) => {
     let stderr = "";
@@ -95,9 +97,11 @@ test("MCP requests carry Layntra context through a simulated Figma plugin", asyn
     socket.on("data", onData);
   });
 
-  const nextMcpResponse = () => new Promise((resolve, reject) => {
+  const nextMcpResponse = (label = "unknown") => new Promise((resolve, reject) => {
     let stdout = "";
-    const timeout = setTimeout(() => reject(new Error("MCP response timed out")), 3_000);
+    const timeout = setTimeout(() => reject(new Error(
+      `MCP response timed out: ${label}; exit=${child.exitCode}; stderr=${bridgeStderr}`
+    )), 3_000);
     const onData = (chunk) => {
       stdout += chunk;
       const line = stdout.split("\n").find(Boolean);
@@ -110,7 +114,7 @@ test("MCP requests carry Layntra context through a simulated Figma plugin", asyn
   });
 
   let commandReceived = nextCommand();
-  let mcpResponse = nextMcpResponse();
+  let mcpResponse = nextMcpResponse("get_document");
   child.stdin.write(`${JSON.stringify({
     jsonrpc: "2.0",
     id: 10,
@@ -134,7 +138,7 @@ test("MCP requests carry Layntra context through a simulated Figma plugin", asyn
   assert.deepEqual(data.nodes, []);
 
   commandReceived = nextCommand();
-  mcpResponse = nextMcpResponse();
+  mcpResponse = nextMcpResponse("get_status connected");
   child.stdin.write(`${JSON.stringify({
     jsonrpc: "2.0",
     id: 11,
@@ -160,12 +164,16 @@ test("MCP requests carry Layntra context through a simulated Figma plugin", asyn
   assert.equal(status.figmaPlugin, "connected");
   assert.equal(status.transport, "local_loopback");
   assert.equal(status.endpoint, "127.0.0.1:3846");
+  assert.equal(status.transportPolicy, "local_only");
+  assert.equal(status.fallback, "none");
+  assert.equal(status.autoLaunch.state, "connected");
   assert.equal(status.fileName, "Disposable E2E");
   assert.equal(status.page.id, "0:1");
   assert.equal(status.selection[0].name, "Login Card");
 
   const expectedContext = { pageId: "0:1", selectionIds: ["1:2"] };
   commandReceived = nextCommand();
+  mcpResponse = nextMcpResponse("update_nodes");
   child.stdin.write(`${JSON.stringify({
     jsonrpc: "2.0",
     id: 12,
@@ -178,4 +186,28 @@ test("MCP requests carry Layntra context through a simulated Figma plugin", asyn
   command = await commandReceived;
   assert.equal(command.command, "update_nodes");
   assert.deepEqual(command.args.expectedContext, expectedContext);
+  socket.write(maskedFrame(JSON.stringify({
+    type: "mcp-result",
+    requestId: command.requestId,
+    ok: true,
+    data: { updated: [{ id: "1:3", text: "Updated" }] }
+  })));
+  response = await mcpResponse;
+  assert.equal(response.id, 12);
+
+  const socketEnded = new Promise((resolve) => socket.once("end", resolve));
+  socket.write(maskedFrame("", 0x8));
+  await socketEnded;
+
+  mcpResponse = nextMcpResponse("get_status disconnected");
+  child.stdin.write(`${JSON.stringify({
+    jsonrpc: "2.0",
+    id: 13,
+    method: "tools/call",
+    params: { name: "get_status", arguments: {} }
+  })}\n`);
+  response = await mcpResponse;
+  const disconnected = JSON.parse(response.result.content[0].text);
+  assert.equal(disconnected.figmaPlugin, "not_connected");
+  assert.equal(disconnected.fallback, "none");
 });

@@ -51,7 +51,7 @@ $layntra plan selection
 $layntra apply
 ```
 
-如果结果不符合预期，输入 `$layntra undo`。伴侣插件仍从
+如果结果不符合预期，输入 `$layntra undo`。Layntra for Figma 仍从
 **Plugins → Development** 运行，公开路径是 `apps/figma-plugin/manifest.json`。
 
 ## 回滚

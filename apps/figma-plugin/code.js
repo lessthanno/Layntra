@@ -1,6 +1,22 @@
-// Figma does not allow background plugins, so the compact UI remains the honest
-// connection boundary while this plugin is running.
-figma.showUI(__html__, { width: 360, height: 330, visible: true, themeColors: true });
+// Keep the required visible plugin boundary small enough not to cover the canvas.
+const UI_WIDTH = 248;
+const UI_HEIGHT = 64;
+const UI_MARGIN = 16;
+const FIGMA_WINDOW_CHROME = 40;
+const viewportZoom = Math.max(figma.viewport.zoom, 0.01);
+const viewportBounds = figma.viewport.bounds;
+const lowerLeftPosition = {
+  x: viewportBounds.x + (UI_MARGIN / viewportZoom),
+  y: viewportBounds.y + viewportBounds.height - ((UI_HEIGHT + FIGMA_WINDOW_CHROME + UI_MARGIN) / viewportZoom)
+};
+figma.showUI(__html__, {
+  width: UI_WIDTH,
+  height: UI_HEIGHT,
+  title: "Layntra",
+  position: lowerLeftPosition,
+  visible: true,
+  themeColors: true
+});
 
 const CONNECTION_ENABLED_KEY = "layntra.connectionEnabled";
 
@@ -940,21 +956,6 @@ figma.ui.onmessage = async (message) => {
         throw new Error("Connection preference must be a boolean.");
       }
       await figma.clientStorage.setAsync(CONNECTION_ENABLED_KEY, message.enabled);
-      return;
-    }
-
-    if (message.type === "replace-photo") {
-      const count = await runWrite(() => replacePhoto(message.bytes));
-      figma.ui.postMessage({ type: "success", message: `已替换 ${count} 个照片框。` });
-      return;
-    }
-
-    if (message.type === "apply-details") {
-      const changed = await runWrite(() => applyDetails(message));
-      figma.ui.postMessage({
-        type: "success",
-        message: `已更新 ${changed} 个文字图层。`
-      });
       return;
     }
 

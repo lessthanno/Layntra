@@ -11,9 +11,10 @@ test("bridge starts and answers MCP initialize without installed packages", asyn
   const isolatedDir = await mkdtemp(path.join(tmpdir(), "layntra-bridge-"));
   const serverPath = path.join(isolatedDir, "server.mjs");
   await cp(path.join(bridgeDir, "server.js"), serverPath);
+  await cp(path.join(bridgeDir, "figma-auto-launch.js"), path.join(isolatedDir, "figma-auto-launch.js"));
 
   const child = spawn(process.execPath, [serverPath], {
-    env: { ...process.env, LAYNTRA_PORT: "0" },
+    env: { ...process.env, LAYNTRA_PORT: "0", LAYNTRA_AUTO_LAUNCH: "0" },
     stdio: ["pipe", "pipe", "pipe"]
   });
   t.after(async () => {
@@ -56,7 +57,7 @@ test("bridge starts and answers MCP initialize without installed packages", asyn
 
 test("bridge advertises bounded generic design tools", async (t) => {
   const child = spawn(process.execPath, [path.join(bridgeDir, "server.js")], {
-    env: { ...process.env, LAYNTRA_PORT: "0" },
+    env: { ...process.env, LAYNTRA_PORT: "0", LAYNTRA_AUTO_LAUNCH: "0" },
     stdio: ["pipe", "pipe", "pipe"]
   });
   t.after(() => child.kill());
@@ -90,7 +91,7 @@ test("bridge advertises bounded generic design tools", async (t) => {
 
 test("status explains how to connect when Figma is not open", async (t) => {
   const child = spawn(process.execPath, [path.join(bridgeDir, "server.js")], {
-    env: { ...process.env, LAYNTRA_PORT: "0" },
+    env: { ...process.env, LAYNTRA_PORT: "0", LAYNTRA_AUTO_LAUNCH: "0" },
     stdio: ["pipe", "pipe", "pipe"]
   });
   t.after(() => child.kill());
@@ -118,6 +119,9 @@ test("status explains how to connect when Figma is not open", async (t) => {
   assert.equal(status.bridge, "ready");
   assert.equal(status.transport, "local_loopback");
   assert.equal(status.endpoint, "127.0.0.1:3846");
+  assert.equal(status.transportPolicy, "local_only");
+  assert.equal(status.fallback, "none");
+  assert.equal(status.autoLaunch.state, "disabled");
   assert.equal(status.figmaPlugin, "not_connected");
   assert.match(status.nextStep, /Layntra for Figma/);
 });

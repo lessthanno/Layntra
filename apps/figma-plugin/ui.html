@@ -8,7 +8,6 @@
       :root {
         color-scheme: light dark;
         --bg: var(--figma-color-bg, #ffffff);
-        --surface: var(--figma-color-bg-secondary, #f5f5f5);
         --text: var(--figma-color-text, #1e1e1e);
         --muted: var(--figma-color-text-secondary, #6b6b6b);
         --border: var(--figma-color-border, #d9d9d9);
@@ -17,89 +16,70 @@
         --warning: #c26a16;
         --idle: #8a8a8a;
         --danger: #d14343;
-        --radius: 12px;
+        --radius: 14px;
       }
 
       * { box-sizing: border-box; }
 
       body {
         margin: 0;
-        padding: 16px;
+        padding: 6px;
         color: var(--text);
-        background: var(--bg);
+        background: transparent;
         font: 13px/1.45 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
 
-      h1, p, dl, dd { margin: 0; }
-
-      header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 2px 2px 14px;
-      }
-
-      .mark {
-        display: grid;
-        width: 32px;
-        height: 32px;
-        flex: 0 0 auto;
-        place-items: center;
-        border-radius: 9px;
-        color: #ffffff;
-        background: var(--brand);
-        font-weight: 700;
-      }
-
-      h1 { font-size: 15px; line-height: 1.2; }
-      .subtitle { margin-top: 2px; color: var(--muted); font-size: 11px; }
+      p { margin: 0; }
 
       .panel {
-        overflow: hidden;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        height: 52px;
         border: 1px solid var(--border);
         border-radius: var(--radius);
-        background: var(--surface);
+        background: var(--bg);
+        box-shadow: 0 6px 18px rgb(0 0 0 / 16%);
       }
 
       .status {
-        display: grid;
-        grid-template-columns: 12px 1fr;
-        column-gap: 10px;
-        min-height: 76px;
-        padding: 14px;
-        border-bottom: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-width: 0;
+        height: 100%;
+        padding: 0 12px;
       }
 
-      .dot {
-        width: 10px;
-        height: 10px;
-        margin-top: 4px;
-        border-radius: 50%;
-        background: var(--idle);
+      .status[data-state="connecting"] strong { color: var(--warning); }
+      .status[data-state="connected"] strong { color: var(--success); }
+      .status[data-state="unavailable"] strong { color: var(--danger); }
+
+      .status strong { display: block; font-size: 12px; }
+      .status p {
+        margin-top: 2px;
+        overflow: hidden;
+        color: var(--muted);
+        font-size: 10px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
-
-      .status[data-state="connecting"] .dot { background: var(--warning); }
-      .status[data-state="connected"] .dot { background: var(--success); }
-      .status[data-state="unavailable"] .dot { background: var(--danger); }
-
-      .status strong { display: block; font-size: 13px; }
-      .status p { margin-top: 3px; color: var(--muted); font-size: 12px; }
 
       .control {
         display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 16px;
-        align-items: center;
-        min-height: 72px;
-        padding: 12px 14px;
+        width: 54px;
+        height: 44px;
+        margin-right: 4px;
+        place-items: center;
+        border-radius: 10px;
+        background: var(--figma-color-bg-secondary, #f3f3f3);
       }
 
-      .control strong, .control span { display: block; }
-      .control span { margin-top: 2px; color: var(--muted); font-size: 11px; }
+      .control-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
       .switch {
         position: relative;
-        width: 48px;
+        width: 44px;
         height: 44px;
         padding: 0;
         border: 0;
@@ -110,7 +90,10 @@
       .switch::before {
         content: "";
         position: absolute;
-        inset: 11px 0;
+        top: 13px;
+        right: 6px;
+        bottom: 13px;
+        left: 6px;
         border-radius: 999px;
         background: var(--idle);
       }
@@ -118,10 +101,10 @@
       .switch::after {
         content: "";
         position: absolute;
-        top: 14px;
-        left: 3px;
-        width: 16px;
-        height: 16px;
+        top: 15px;
+        left: 8px;
+        width: 14px;
+        height: 14px;
         border-radius: 50%;
         background: #ffffff;
         box-shadow: 0 1px 2px rgb(0 0 0 / 28%);
@@ -129,46 +112,8 @@
       }
 
       .switch[aria-checked="true"]::before { background: var(--brand); }
-      .switch[aria-checked="true"]::after { transform: translateX(26px); }
+      .switch[aria-checked="true"]::after { transform: translateX(16px); }
       .switch:disabled { cursor: wait; opacity: .55; }
-
-      .context {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-        margin-top: 12px;
-      }
-
-      .context div {
-        min-width: 0;
-        padding: 10px 12px;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-      }
-
-      dt {
-        color: var(--muted);
-        font-size: 10px;
-        font-weight: 600;
-        letter-spacing: .06em;
-        text-transform: uppercase;
-      }
-
-      dd {
-        margin-top: 3px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        font-size: 12px;
-        font-weight: 600;
-      }
-
-      .platform-note {
-        margin-top: 12px;
-        padding: 0 2px;
-        color: var(--muted);
-        font-size: 11px;
-      }
 
       :focus-visible { outline: 3px solid #8d8aff; outline-offset: 2px; }
 
@@ -178,28 +123,14 @@
     </style>
   </head>
   <body>
-    <header>
-      <div class="mark" aria-hidden="true">L</div>
-      <div>
-        <h1>Layntra for Figma</h1>
-        <p class="subtitle">Local connection control</p>
-      </div>
-    </header>
-
-    <section class="panel">
+    <section class="panel" aria-label="Layntra for Figma connection">
       <div id="connection-status" class="status" data-state="loading" aria-live="polite" aria-atomic="true">
-        <div class="dot" aria-hidden="true"></div>
-        <div>
-          <strong id="connection-title">Loading preference</strong>
-          <p id="connection-detail">Checking your saved connection setting.</p>
-        </div>
+        <strong id="connection-title">Layntra</strong>
+        <p id="connection-detail">Loading local connection</p>
       </div>
 
       <div class="control">
-        <div>
-          <strong id="auto-connect-label">Auto-connect</strong>
-          <span id="auto-connect-help">Connect whenever this companion is open.</span>
-        </div>
+        <span id="auto-connect-label" class="control-label">Auto-connect</span>
         <button
           id="connection-toggle"
           class="switch"
@@ -207,42 +138,25 @@
           role="switch"
           aria-checked="false"
           aria-labelledby="auto-connect-label"
-          aria-describedby="auto-connect-help"
+          title="Auto-connect"
           disabled
         ></button>
       </div>
     </section>
 
-    <dl class="context" aria-label="Current Figma context">
-      <div>
-        <dt>File</dt>
-        <dd id="file-name" title="Waiting for Figma">Waiting for Figma</dd>
-      </div>
-      <div>
-        <dt>Page</dt>
-        <dd id="page-name" title="Waiting for Figma">Waiting for Figma</dd>
-      </div>
-    </dl>
-
-    <p class="platform-note">
-      Figma requires one start per editor session. Use <strong>Open Layntra</strong> in Properties to reopen quickly.
-    </p>
-
     <script>
       const stateCopy = {
-        loading: ["Loading preference", "Checking your saved connection setting."],
-        off: ["Connection off", "Codex cannot access this Figma file."],
-        connecting: ["Connecting", "Looking for the local Layntra bridge."],
-        connected: ["Connected locally", "Codex can edit this file without hosted MCP."],
-        unavailable: ["Bridge unavailable", "Waiting for the local bridge. Retrying automatically."]
+        loading: ["Layntra", "Loading local connection"],
+        off: ["Connection off", "Auto-connect disabled"],
+        connecting: ["Connecting locally", "127.0.0.1:3846"],
+        connected: ["Connected locally", "Layntra MCP · local only"],
+        unavailable: ["Bridge unavailable", "Retrying locally · no fallback"]
       };
 
       const statusElement = document.getElementById("connection-status");
       const titleElement = document.getElementById("connection-title");
       const detailElement = document.getElementById("connection-detail");
       const toggleElement = document.getElementById("connection-toggle");
-      const fileElement = document.getElementById("file-name");
-      const pageElement = document.getElementById("page-name");
 
       let state = "loading";
       let connectionEnabled = false;
@@ -265,17 +179,6 @@
         render();
       }
 
-      function updateContext(fileName, pageName) {
-        if (typeof fileName === "string" && fileName.trim()) {
-          fileElement.textContent = fileName;
-          fileElement.title = fileName;
-        }
-        if (typeof pageName === "string" && pageName.trim()) {
-          pageElement.textContent = pageName;
-          pageElement.title = pageName;
-        }
-      }
-
       function stopBridge() {
         clearTimeout(retryTimer);
         retryTimer = null;
@@ -283,6 +186,9 @@
         const activeBridge = bridge;
         bridge = null;
         if (activeBridge) {
+          if (activeBridge.readyState === WebSocket.OPEN) {
+            activeBridge.send(JSON.stringify({ type: "connection-preference", enabled: false }));
+          }
           activeBridge.onclose = null;
           activeBridge.onerror = null;
           activeBridge.close();
@@ -367,17 +273,12 @@
         if (incoming.type === "connection-preference") {
           const wasLoaded = preferenceLoaded;
           preferenceLoaded = true;
-          updateContext(incoming.fileName, incoming.pageName);
           const enabled = incoming.enabled !== false;
           if (!wasLoaded || enabled !== connectionEnabled) {
             setConnectionEnabled(enabled, false);
           } else {
             render();
           }
-          return;
-        }
-        if (incoming.type === "figma-context") {
-          updateContext(incoming.fileName, incoming.pageName);
           return;
         }
         if (incoming.type === "mcp-result" && bridge?.readyState === WebSocket.OPEN) {
