@@ -11,14 +11,12 @@ ready. Every result remains editable in Figma.
 
 **Website:** [lessthanno.github.io/Layntra](https://lessthanno.github.io/Layntra/)
 
-## Download
+## Install once, update automatically
 
-**[Download Layntra v0.1.0](https://github.com/lessthanno/Layntra/releases/tag/v0.1.0)**
-
-On the release page, download `layntra-figma-plugin.zip` under **Assets**, then
-unzip it—do not import the ZIP itself. Follow step 4 below to choose the included
-plugin file. This download is the Figma side of Layntra; the Codex plugin is
-installed in step 1 below.
+Clone Layntra once. The local Codex skill, bridge, and Figma companion then
+update together from the official repository when Layntra starts. Figma keeps
+the same imported manifest path, so upgrades do not require another download,
+file replacement, or import.
 
 ## Quick start
 
@@ -28,21 +26,20 @@ Design plugins.
 
 1. Clone this repository and run `./scripts/install.sh` to install the Codex
    plugin.
-2. Download and unzip the **Layntra for Figma plugin** using the button above.
-3. Open a Design file in Figma Desktop.
-4. Choose **Plugins → Development → Import plugin from manifest…** and select
-   `layntra-figma-plugin/manifest.json` from the unzipped download. If you cloned
-   the repository, `apps/figma-plugin/manifest.json` is the same plugin.
+2. Open a Design file in Figma Desktop. The installer imports
+   `apps/figma-plugin/manifest.json` automatically on macOS. If Accessibility
+   permission prevented that one-time import, choose **Plugins → Development →
+   Import plugin from manifest…** and select that file from the cloned repository.
 
 ![Figma menu path: Plugins, Development, Import plugin from manifest](docs/assets/figma-import-manifest-path.png)
 
-5. Run **Plugins → Development → Layntra for Figma** and keep its small window
+3. Run **Plugins → Development → Layntra for Figma** and keep its small window
    open while you use Codex. Confirm that it shows **Connected locally** before
    continuing. This is a required Figma-side step: **Auto-connect** keeps the
    local WebSocket connected and retries it, but it cannot run an unopened Figma
    development plugin in the background. In later editor sessions, use
    **Open Layntra** in the Properties panel to reopen it quickly.
-6. Only after the plugin shows **Connected locally**, start a new Codex task and
+4. Only after the plugin shows **Connected locally**, start a new Codex task and
    enter:
 
 ```text
@@ -99,6 +96,11 @@ When Layntra is active, it does not call Figma's hosted MCP and therefore does
 not consume Figma hosted-MCP tool-call quotas. If Figma displays an MCP upgrade
 prompt, the request was routed through the wrong transport; stop and run
 `$layntra status` to confirm `local_loopback` and `127.0.0.1:3846`.
+
+At startup, Layntra checks the official Git origin at most once every six hours
+and only fast-forwards a clean checkout. Offline checks, local modifications,
+untrusted remotes, and diverged branches are left untouched; the installed
+version continues to work. Set `LAYNTRA_AUTO_UPDATE=0` to disable checks.
 
 Writes are limited to supported editable nodes and batches of at most 100.
 Deletion and arbitrary code execution are not exposed in `v0.1.0`.

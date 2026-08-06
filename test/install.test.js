@@ -51,6 +51,8 @@ test("installer registers and installs Layntra with actionable output", async (t
   assert.match(result.stdout, /apps\/figma-plugin\/manifest\.json/);
   assert.match(result.stdout, /run Plugins → Development → Layntra for Figma and keep it open/);
   assert.match(result.stdout, /plugin shows Connected locally/);
+  assert.match(result.stdout, /Automatic updates are enabled/);
+  assert.match(result.stdout, /no re-import is needed/);
   assert.match(result.stdout, /\$layntra status/);
 });
 

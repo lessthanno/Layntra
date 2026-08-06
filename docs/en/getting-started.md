@@ -7,23 +7,25 @@ This guide assumes no plugin-development experience.
 1. Install Node.js 20+, Codex Desktop or CLI, and Figma Desktop.
 2. Clone Layntra and run `./scripts/install.sh` from the repository root to
    install the Codex plugin.
-3. Open **[Layntra v0.1.0](https://github.com/lessthanno/Layntra/releases/tag/v0.1.0)**,
-   download `layntra-figma-plugin.zip` under **Assets**, then unzip it. Do not
-   import the ZIP itself.
-4. Open a Design file in Figma Desktop. A personal Starter workspace is the
+3. Open a Design file in Figma Desktop. A personal Starter workspace is the
    free path when an organization Dev/Collab/View seat blocks Design plugins.
-5. Choose **Plugins → Development → Import plugin from manifest…**.
-6. Select `layntra-figma-plugin/manifest.json` inside the unzipped download.
-   The equivalent source path is `apps/figma-plugin/manifest.json`.
+4. The installer imports `apps/figma-plugin/manifest.json` automatically on
+   macOS. If Accessibility permission blocked it, choose **Plugins → Development
+   → Import plugin from manifest…** and select that file in the cloned repository.
 
 ![Figma menu path: Plugins, Development, Import plugin from manifest](../assets/figma-import-manifest-path.png)
 
-7. Run **Plugins → Development → Layntra for Figma** once. The compact
+5. Run **Plugins → Development → Layntra for Figma** once. The compact
    companion auto-connects by default and remembers the **Auto-connect** switch.
    Figma does not allow background plugins, so later editor sessions still need
    one user start. Use **Open Layntra** in the Properties panel instead of
    navigating the Development menu again.
-8. Start a new Codex task so the installed plugin is loaded.
+6. Start a new Codex task so the installed plugin is loaded.
+
+Layntra checks the official repository at startup and safely fast-forwards a
+clean checkout at most once every six hours. The imported Figma path does not
+change, so updates need no second download or import. Offline and locally
+modified checkouts continue using the installed version.
 
 ## Confirm the connection
 

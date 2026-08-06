@@ -54,8 +54,7 @@ test("bilingual onboarding embeds the Figma manifest import path screenshot", as
   }
 });
 
-test("bilingual onboarding exposes the stable Figma companion download", async () => {
-  const download = "https://github.com/lessthanno/Layntra/releases/tag/v0.1.0";
+test("bilingual onboarding documents install-once automatic updates", async () => {
   for (const file of [
     "README.md",
     "README.zh-CN.md",
@@ -63,8 +62,8 @@ test("bilingual onboarding exposes the stable Figma companion download", async (
     "docs/zh-CN/getting-started.md"
   ]) {
     const content = await readFile(file, "utf8");
-    assert.match(content, new RegExp(download.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")), `${file} is missing the download`);
-    assert.match(content, /layntra-figma-plugin\.zip/, `${file} must name the release asset`);
-    assert.match(content, /unzip|解压/i, `${file} must explain that the download needs extraction`);
+    assert.match(content, /automatic|自动更新/i, `${file} must explain automatic updates`);
+    assert.match(content, /apps\/figma-plugin\/manifest\.json/, `${file} must name the stable manifest path`);
+    assert.doesNotMatch(content, /layntra-figma-plugin\.zip/, `${file} must not require repeated ZIP installs`);
   }
 });

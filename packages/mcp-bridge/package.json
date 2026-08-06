@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "check": "node --check server.js",
+    "check": "node --check auto-update.js && node --check bootstrap.js && node --check server.js",
     "test": "node --test test/*.test.js"
   },
   "dependencies": {}

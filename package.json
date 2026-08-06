@@ -7,7 +7,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "check": "node --check apps/figma-plugin/code.js && node --check packages/mcp-bridge/server.js",
+    "check": "node --check apps/figma-plugin/code.js && node --check packages/mcp-bridge/auto-update.js && node --check packages/mcp-bridge/bootstrap.js && node --check packages/mcp-bridge/server.js",
     "package:figma": "bash scripts/package-figma-plugin.sh",
     "test": "node --test packages/mcp-bridge/test/*.test.js test/*.test.js",
     "audit:public": "bash scripts/audit-public.sh",

@@ -11,6 +11,13 @@ const clients = new Set();
 const pending = new Map();
 const pluginEvents = new EventEmitter();
 const autoLauncher = createFigmaAutoLauncher();
+const updateStatus = (() => {
+  try {
+    return JSON.parse(process.env.LAYNTRA_UPDATE_STATUS || '{"state":"not_checked"}');
+  } catch {
+    return { state: "invalid_status" };
+  }
+})();
 
 function activePluginOrNull() {
   return [...clients].find((socket) => socket.isFigmaPlugin && !socket.destroyed) || null;
@@ -293,7 +300,8 @@ async function toolCall(name, args = {}) {
       endpoint: "127.0.0.1:3846",
       transportPolicy: "local_only",
       fallback: "none",
-      autoLaunch: autoLauncher.status()
+      autoLaunch: autoLauncher.status(),
+      automaticUpdate: updateStatus
     };
     if (!pluginConnected) return {
       ...transport,

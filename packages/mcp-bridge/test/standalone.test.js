@@ -90,8 +90,8 @@ test("bridge advertises bounded generic design tools", async (t) => {
 });
 
 test("status explains how to connect when Figma is not open", async (t) => {
-  const child = spawn(process.execPath, [path.join(bridgeDir, "server.js")], {
-    env: { ...process.env, LAYNTRA_PORT: "0", LAYNTRA_AUTO_LAUNCH: "0" },
+  const child = spawn(process.execPath, [path.join(bridgeDir, "bootstrap.js")], {
+    env: { ...process.env, LAYNTRA_PORT: "0", LAYNTRA_AUTO_LAUNCH: "0", LAYNTRA_AUTO_UPDATE: "0" },
     stdio: ["pipe", "pipe", "pipe"]
   });
   t.after(() => child.kill());
@@ -122,6 +122,7 @@ test("status explains how to connect when Figma is not open", async (t) => {
   assert.equal(status.transportPolicy, "local_only");
   assert.equal(status.fallback, "none");
   assert.equal(status.autoLaunch.state, "disabled");
+  assert.equal(status.automaticUpdate.state, "disabled");
   assert.equal(status.figmaPlugin, "not_connected");
   assert.match(status.nextStep, /Layntra for Figma/);
 });

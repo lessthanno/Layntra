@@ -9,13 +9,11 @@ Layntra 是为产品经理和非技术用户准备的 Codex 插件。用 `$laynt
 
 **官网：** [lessthanno.github.io/Layntra](https://lessthanno.github.io/Layntra/)
 
-## 下载插件
+## 安装一次，后续自动更新
 
-**[下载 Layntra v0.1.0](https://github.com/lessthanno/Layntra/releases/tag/v0.1.0)**
-
-打开 Release 页面后，在 **Assets** 里下载 `layntra-figma-plugin.zip`。下载后
-先解压，不要直接导入 ZIP；按照下面第 4 步选择解压后的插件文件。这个下载包是
-Layntra 的 Figma 端，Codex 插件在下面第 1 步安装。
+只需克隆并安装一次。以后 Layntra 启动时，会从官方仓库一起更新本地 Codex
+Skill、Bridge 和 Figma companion。Figma 始终引用同一个 manifest 路径，升级无需
+重新下载、替换文件或再次导入。
 
 ## 五分钟开始
 
@@ -23,20 +21,19 @@ Layntra 的 Figma 端，Codex 插件在下面第 1 步安装。
 Dev/Collab/View seat 不能运行 Design 插件，请切换到个人 Starter 免费空间。
 
 1. 克隆本仓库，运行 `./scripts/install.sh`，安装 Codex 插件。
-2. 点击上方按钮下载并解压 **Layntra for Figma plugin**。
-3. 在 Figma Desktop 中打开一个 Design 文件。
-4. 选择 **Plugins → Development → Import plugin from manifest…**，导入解压后
-   的 `layntra-figma-plugin/manifest.json`。如果你克隆了仓库，也可以导入同一
-   插件的源码路径 `apps/figma-plugin/manifest.json`。
+2. 在 Figma Desktop 中打开一个 Design 文件。macOS 下 installer 会自动导入
+   `apps/figma-plugin/manifest.json`。如果 Accessibility 权限阻止了这次一次性
+   导入，再选择 **Plugins → Development → Import plugin from manifest…**，并
+   从克隆的仓库中选择该文件。
 
 ![Figma 配置路径：Plugins、Development、Import plugin from manifest](docs/assets/figma-import-manifest-path.png)
 
-5. 运行 **Plugins → Development → Layntra for Figma**，并在使用 Codex 期间保持
+3. 运行 **Plugins → Development → Layntra for Figma**，并在使用 Codex 期间保持
    这个小窗口打开。确认窗口显示 **Connected locally** 后再继续。这是 Figma 端
    的必要前置：**Auto-connect** 只负责保持本地 WebSocket 连接并重试，不能让一个
    尚未打开的 Figma development plugin 在后台运行。后续编辑会话可在 Properties
    面板点击 **Open Layntra** 快速重开。
-6. 只有确认插件显示 **Connected locally** 后，才新建 Codex 任务，输入：
+4. 只有确认插件显示 **Connected locally** 后，才新建 Codex 任务，输入：
 
 ```text
 $layntra status
@@ -87,6 +84,10 @@ Codex Skill → 本地 stdio/MCP Bridge → 本机 WebSocket → Layntra for Fig
 Bridge 只监听 `127.0.0.1:3846`。Layntra 不需要 Figma API token、Layntra 云账号
 或遥测。Codex 模型的数据处理仍由你的 Codex 配置决定；“本地 Bridge”不代表 AI
 模型离线运行。
+
+启动时，Layntra 最多每六小时检查一次官方 Git origin，并且只对干净的工作树做
+fast-forward。离线、存在本地修改、远端不可信或分支已分叉时都不会覆盖文件，当前
+已安装版本会继续工作。设置 `LAYNTRA_AUTO_UPDATE=0` 可关闭自动检查。
 
 写入仅支持受约束的可编辑节点，每批最多 100 个。`v0.1.0` 不提供删除或任意代码
 执行。

@@ -6,20 +6,22 @@
 
 1. 安装 Node.js 20+、Codex Desktop 或 CLI，以及 Figma Desktop。
 2. 克隆 Layntra，在仓库根目录运行 `./scripts/install.sh`，安装 Codex 插件。
-3. 打开 **[Layntra v0.1.0](https://github.com/lessthanno/Layntra/releases/tag/v0.1.0)**，
-   在 **Assets** 里下载 `layntra-figma-plugin.zip`，下载后先解压，不要直接导入 ZIP。
-4. 在 Figma Desktop 打开一个 Design 文件。公司 Dev/Collab/View seat 无法运行
+3. 在 Figma Desktop 打开一个 Design 文件。公司 Dev/Collab/View seat 无法运行
    Design 插件时，个人 Starter 空间是免费路径。
-5. 选择 **Plugins → Development → Import plugin from manifest…**。
-6. 导入解压后文件夹里的 `layntra-figma-plugin/manifest.json`。对应的源码路径是
-   `apps/figma-plugin/manifest.json`。
+4. macOS 下 installer 会自动导入 `apps/figma-plugin/manifest.json`。如果
+   Accessibility 权限阻止了自动导入，再选择 **Plugins → Development → Import
+   plugin from manifest…**，并从克隆的仓库中选择该文件。
 
 ![Figma 配置路径：Plugins、Development、Import plugin from manifest](../assets/figma-import-manifest-path.png)
 
-7. 运行一次 **Plugins → Development → Layntra for Figma**。紧凑状态窗口默认
+5. 运行一次 **Plugins → Development → Layntra for Figma**。紧凑状态窗口默认
    自动连接并记住 **Auto-connect** 开关。Figma 不允许插件在后台自动运行，后续
    编辑会话可在 Properties 面板点击 **Open Layntra** 快速重开。
-8. 新建 Codex 任务，让刚安装的插件被加载。
+6. 新建 Codex 任务，让刚安装的插件被加载。
+
+Layntra 启动时会自动更新：最多每六小时检查一次官方仓库，并只对干净的 checkout 做安全
+fast-forward。Figma 中已导入的路径不会改变，因此更新无需再次下载或导入；离线
+或存在本地修改时会继续使用当前已安装版本。
 
 ## 确认连接
 

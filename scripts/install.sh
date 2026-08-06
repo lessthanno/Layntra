@@ -57,6 +57,7 @@ echo "✓ Layntra is installed"
 if [ "${figma_imported}" = true ]; then
   echo "✓ Layntra for Figma is imported from the current repository"
 fi
+echo "✓ Automatic updates are enabled for this checkout"
 echo
 echo "Next:"
 echo "1. Open the Design file you want to edit in Figma Desktop"
@@ -64,3 +65,4 @@ echo "2. If automatic import was unavailable, import ${manifest_path} once from 
 echo "3. In Figma, run Plugins → Development → Layntra for Figma and keep it open"
 echo "4. Confirm the plugin shows Connected locally"
 echo '5. Start a new Codex task and enter: $layntra status'
+echo "Future updates are applied automatically at startup; no re-import is needed."

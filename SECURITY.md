@@ -19,6 +19,9 @@ Figma documents, access tokens, account data, or unrelated personal content.
 - Document changes execute in the visible Figma Desktop plugin sandbox.
 - Reads and writes are bounded; writes can carry a planned context snapshot.
 - Deletion, remote commands, and arbitrary JavaScript execution are not exposed.
+- Automatic updates accept only the official Layntra GitHub origin and only
+  fast-forward a clean, non-diverged checkout. Git operations are non-interactive
+  and time-bounded; failures preserve and start the installed version.
 
 Processes running as the same operating-system user may reach loopback ports.
 Do not run untrusted local software while a sensitive Figma file and Layntra

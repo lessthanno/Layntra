@@ -7,6 +7,7 @@ test("plugin declares exactly one local Figma transport", async () => {
   assert.deepEqual(Object.keys(config.mcpServers), ["layntra"]);
   assert.equal(config.mcpServers.layntra.command, "node");
   assert.equal(config.mcpServers.layntra.cwd, "./packages/mcp-bridge");
+  assert.deepEqual(config.mcpServers.layntra.args, ["bootstrap.js"]);
   assert.equal("url" in config.mcpServers.layntra, false);
 });
 

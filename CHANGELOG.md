@@ -7,6 +7,8 @@ and semantic versioning.
 
 ### Added
 
+- Install-once automatic updates that safely fast-forward clean official
+  checkouts before loading the local bridge.
 - Persistent Auto-connect control, explicit local connection states, and a
   Properties-panel **Open Layntra** relaunch action.
 - Local transport identity in `$layntra status`.
