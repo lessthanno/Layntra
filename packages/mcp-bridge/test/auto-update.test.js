@@ -20,7 +20,7 @@ async function repositoryFixture(t) {
   t.after(() => import("node:fs/promises").then(({ rm }) => rm(directory, { recursive: true, force: true })));
   git(directory, "init", "--bare", remote);
   git(directory, "init", "-b", "main", seed);
-  git(seed, "config", "user.email", "test@layntra.local");
+  git(seed, "config", "user.email", "layntra-test.invalid");
   git(seed, "config", "user.name", "Layntra Test");
   await writeFile(path.join(seed, "version.txt"), "one\n");
   git(seed, "add", "version.txt");

@@ -7,9 +7,7 @@ import { promisify } from "node:util";
 const execFileAsync = promisify(execFile);
 const OFFICIAL_REMOTES = new Set([
   "https://github.com/lessthanno/Layntra",
-  "https://github.com/lessthanno/Layntra.git",
-  "git@github.com:lessthanno/Layntra.git",
-  "ssh://git@github.com/lessthanno/Layntra.git"
+  "https://github.com/lessthanno/Layntra.git"
 ]);
 const DEFAULT_INTERVAL_MS = 6 * 60 * 60 * 1000;
 

@@ -24,8 +24,8 @@ branch from its matching `origin` branch.
 
 The updater MUST:
 
-- accept only the official `github.com/lessthanno/Layntra` HTTPS or SSH remote
-  as the production origin;
+- accept only the official `https://github.com/lessthanno/Layntra` remote as the
+  production origin;
 - disable Git credential prompts and bound each Git operation to five seconds;
 - update only a clean tracked worktree with no local commits or divergence;
 - use `git merge --ff-only` and never reset, delete, stash, or overwrite work;
