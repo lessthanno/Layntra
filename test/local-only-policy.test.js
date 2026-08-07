@@ -27,9 +27,14 @@ test("Layntra policy never references or falls back to the hosted Figma endpoint
 test("installer audits active hosted Figma conflicts before registration", async () => {
   const installer = await readFile("scripts/install.sh", "utf8");
   const audit = await readFile("scripts/audit-hosted-figma-mcp.sh", "utf8");
+  const desktopMcp = await readFile("scripts/disable-figma-desktop-mcp.sh", "utf8");
   assert.match(installer, /audit-hosted-figma-mcp\.sh/);
+  assert.match(installer, /disable-figma-desktop-mcp\.sh/);
   assert.match(audit, /mcp\.figma\.com/);
   assert.match(audit, /exit 1/);
+  assert.match(desktopMcp, /desktop_make_local_mcp_enabled/);
+  assert.match(desktopMcp, /desktop_make_local_mcp_proxy_mode/);
+  assert.match(desktopMcp, /3845\/mcp/);
 });
 
 test("macOS automation selects only the exact local Layntra development plugin", async () => {

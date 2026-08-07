@@ -11,6 +11,12 @@ The runtime contract is `transportPolicy: local_only` and `fallback: none`.
 Installation fails while active Codex configuration references
 `mcp.figma.com`.
 
+On macOS, installation also disables Figma Desktop MCP's local feature flags
+(`desktop_make_local_mcp_enabled` and `desktop_make_local_mcp_proxy_mode`) and
+keeps a one-time backup of Figma's settings. This prevents the official Figma
+Desktop MCP listener at `127.0.0.1:3845/mcp` from being discovered alongside
+Layntra's `127.0.0.1:3846` bridge.
+
 On macOS, the installer imports the current checkout's manifest and the bridge
 launches the exact **Layntra for Figma** Development-menu item. Launch attempts
 are idempotent, bounded by cooldown, and never select the last-run plugin.

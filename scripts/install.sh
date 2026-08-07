@@ -23,6 +23,9 @@ if ! command -v codex >/dev/null 2>&1; then
 fi
 
 bash "${script_dir}/audit-hosted-figma-mcp.sh"
+if [ "$(uname -s)" = "Darwin" ]; then
+  bash "${script_dir}/disable-figma-desktop-mcp.sh"
+fi
 
 existing_root="$(codex plugin marketplace list | sed -n 's/^layntra[[:space:]][[:space:]]*//p')"
 if [ -n "${existing_root}" ] && [ "${existing_root}" != "${repo_root}" ]; then
